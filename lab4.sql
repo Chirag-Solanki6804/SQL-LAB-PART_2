@@ -148,7 +148,197 @@ WHERE
 
 EXEC PR_PARSON_UPDATE 
 ---------------------------------------------------------------
+---select 1
+create procedure Pr_designation_selectAll
+as
+begin
+     select designationId,designationName from designation
+end
+
+exec Pr_designation_selectAll; 
 
 
+--select 2
+create procedure Pr_department1_selectAll
+as
+begin
+     select departmentid,departmentName from department1
+end
+
+exec Pr_department1_selectAll;
+
+--select 3
+
+alter procedure pr_person_selectAll
+as 
+begin
+select
+     PARSON.WORKERID,
+	 PARSON.FIRSTNAME,
+	 PARSON.LASTNAME,
+	 PARSON.SALARY,
+	 PARSON.JOININGDATE,
+	 department1.departmentname,
+	 designation.DESIGNATIONNAME
+	 from PARSON inner join department1
+	 on
+	 PARSON.DEPARTMENTID=department1.departmentid
+	 inner join designation
+	 on
+	 PARSON.DESIGNATIONID=designation.DESIGNATIONID
+end
+
+exec pr_person_selectAll
+ 
+
+-----3.selectbypk
+--1
+create procedure pr_designation_selectPk
+    @designationid int
+as
+begin
+select 
+    designationid,
+	designationName
+from designation
+where designationid=@designationid
+end
+
+exec pr_designation_selectPk 11
+
+--2
+create procedure pr_department_selectPk
+    @departmentid int
+as
+begin
+select 
+    departmentid,
+	departmentName
+from department1
+where departmentid=@departmentid
+end
+
+exec pr_department_selectPk 1
+
+--3
+create procedure pr_parson1_selectPk
+    @WORKERID INT
+as
+begin
+select 
+    WORKERID,
+    FIRSTNAME,
+	LASTNAME,
+	SALARY,
+	JOININGDATE,
+	DEPARTMENTID,
+	DESIGNATIONID 
+   
+from PARSON
+where WORKERID=@WORKERID
+end
+
+exec pr_parson1_selectPk 101
+----------------------------------------------
+---4
+create procedure pr_parson_selectBydesignationDepartmentName
+    @deparmentName varchar(200),
+    @designationname varchar(250)
+as
+begin
+select 
+    PARSON.WORKERID,
+    PARSON.FIRSTNAME,
+	PARSON.LASTNAME,
+	PARSON.SALARY,
+	PARSON.JOININGDATE,
+	department1.departmentname,
+	designation.DESIGNATIONID 
+   
+from PARSON
+left outer join department1
+on department1.departmentid=PARSON.DESIGNATIONID
+LEFT OUTER JOIN designation 
+ON DESIGNATION.DESIGNATIONID=PARSON.DESIGNATIONID
+where designationNAME=@designationname
+AND
+departmentname=@deparmentName
+end
+
+EXEC pr_parson_selectBydesignationDepartmentName IT,WELDER
+
+-------------------------------------------------------------------------------------------------------
+--5
+create procedure pr_parson_selectByNAME
+    @FIRSTNAME VARCHAR(200)
+as
+begin
+select 
+    PARSON.WORKERID,
+    PARSON.FIRSTNAME,
+	PARSON.LASTNAME,
+	PARSON.SALARY,
+	PARSON.JOININGDATE,
+	department1.departmentname,
+	designation.DESIGNATIONID 
+   
+from PARSON
+left outer join department1
+on department1.departmentid=PARSON.DESIGNATIONID
+LEFT OUTER JOIN designation 
+ON DESIGNATION.DESIGNATIONID=PARSON.DESIGNATIONID
+where FIRSTNAME=@FIRSTNAME
+end
+
+EXEC pr_parson_selectByNAME rahul
+
+---------------------------------------------------------------------------------------
+--6
+alter procedure pr_person_selectAll_Min_Max_sum_salary
+as
+begin
+select department1.departmentname,max(parson.salary) as max_salary,min(parson.salary) as Min_salary,sum(parson.salary)as sum_salary
+from PARSON inner join department1
+on
+department1.departmentid=PARSON.DEPARTMENTID
+group by department1.departmentname
+end
 
 
+exec pr_person_selectAll_Min_Max_sum_salary;
+---------------------------------------------------------------------
+-------------view-----------
+create view first100_worker_detail
+as select top 100
+    WORKERID,
+    FIRSTNAME,
+	LASTNAME,
+	SALARY,
+	JOININGDATE,
+	DEPARTMENTID,
+	DESIGNATIONID 
+	from PARSON
+
+select*from first100_worker_detail
+
+--------------------------------------
+--2
+
+create view desigantionWise_max_min_sum_salary
+as select
+designation.DESIGNATIONNAME,
+max(parson.salary) as max_salary,
+min(parson.salary) as min_salary,
+sum(parson.salary) as sum_salary
+from parson
+inner join designation
+on 
+designation.designationid=parson.designationid
+group by
+designation.designationName
+
+
+select*from desigantionWise_max_min_sum_salary
+
+---3
+ 
